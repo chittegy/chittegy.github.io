@@ -85,81 +85,106 @@
       <p id="joke"></p>
       <h3>Comic</h3>
       <p id="comic"></p>
+      <h3>Weather</h3>
+      <p id="weather"></p>
     </div>
   </div>
   
 <script>
 
-    // Check for cookies and display welcome message
-    function setCookie(cname, cvalue, exdays) {
-    const d = new Date();
-    // Convert to EST by subtracting 5 hours (EST is UTC-5)
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000) - (-0.01*60 * 60 * 1000));
-    let expires = "expires="+ d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    // Function to set a cookie with a specified name, value, and expiration days
+function setCookie(name, value, expirationDays) {
+    const currentDate = new Date();
+    currentDate.setTime(currentDate.getTime() + (expirationDays * 24 * 60 * 60 * 1000) - (-0.01 * 60 * 60 * 1000));
+    let expires = "expires=" + currentDate.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
 }
 
+// Function to check for a cookie and display a welcome message accordingly
 function checkCookie() {
     let lastVisit = getCookie("lastVisit");
-    if (lastVisit != "") {
-        // Convert the UTC time in the cookie to EST for display
+    if (lastVisit !== "") {
         let lastVisitDate = new Date(lastVisit);
-        lastVisitDate.setTime(lastVisitDate.getTime() - (-0.01* 60 * 60 * 1000));
-        document.getElementById("welcome-message").innerHTML = "Welcome back! Your last visit was " + lastVisitDate.toLocaleString("en-US", {timeZone: "America/New_York"});
+        lastVisitDate.setTime(lastVisitDate.getTime() - (-0.01 * 60 * 60 * 1000));
+        document.getElementById("welcome-message").innerHTML = "Welcome back! Your last visit was " + lastVisitDate.toLocaleString("en-US", { timeZone: "America/New_York" });
     } else {
         document.getElementById("welcome-message").innerHTML = "Welcome to my homepage!";
     }
     let now = new Date();
-    // Set the cookie with the current time in EST
     setCookie("lastVisit", now.toUTCString(), 365);
 }
 
-    function getCookie(cname) {
-        let name = cname + "=";
-        let decodedCookie = decodeURIComponent(document.cookie);
-        let ca = decodedCookie.split(';');
-        for(let i = 0; i < ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) == ' ') {
-                c = c.substring(1);
-            }
-            if (c.indexOf(name) == 0) {
-                return c.substring(name.length, c.length);
-            }
+// Function to retrieve a cookie by name
+function getCookie(name) {
+    let cookieName = name + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let cookieArray = decodedCookie.split(';');
+    for (let i = 0; i < cookieArray.length; i++) {
+        let currentCookie = cookieArray[i];
+        while (currentCookie.charAt(0) === ' ') {
+            currentCookie = currentCookie.substring(1);
         }
-        return "";
-    }
-
-    //Show/Hide Email
-     function toggleEmail() {
-            let email = document.getElementById('email');
-            email.style.display = (email.style.display === 'none' || email.style.display === '') ? 'block' : 'none';
+        if (currentCookie.indexOf(cookieName) === 0) {
+            return currentCookie.substring(cookieName.length, currentCookie.length);
         }
-    // Fetch a new joke every 1 minute
-    function fetchJoke() {
-        fetch('https://v2.jokeapi.dev/joke/Any')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("joke").innerHTML = data.setup + " " + data.delivery;
-            });
-        setTimeout(fetchJoke, 60000);
     }
+    return "";
+}
 
-    // Fetch a comic from XKCD
-    function fetchComic() {
-        fetch('https://xkcd.com/info.0.json')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("comic").innerHTML = "<img src='" + data.img + "' alt='Comic'>";
-            });
-    }
- 
+// Function to toggle the display of an email element
+function toggleEmail() {
+    let emailElement = document.getElementById('email');
+    emailElement.style.display = (emailElement.style.display === 'none' || emailElement.style.display === '') ? 'block' : 'none';
+}
 
+// Function to fetch a new joke every 1 minute
+function fetchJoke() {
+    fetch('https://v2.jokeapi.dev/joke/Any')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("joke").innerHTML = data.setup + " " + data.delivery;
+        });
+    setTimeout(fetchJoke, 60000);
+}
 
-    // Initialize functions
-    checkCookie();
-    fetchJoke();
-    fetchComic();
+// Function to fetch a comic from XKCD
+function fetchComic() {
+    fetch('https://xkcd.com/info.0.json')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("comic").innerHTML = "<img src='" + data.img + "' alt='Comic'>";
+        });
+}
+function getWeather() {
+            // Your API key from Weatherbit
+            const apiKey = 'fb867770c8ba4db7beb720f07f8fc4d6';
+            // The city you want to get weather information for
+            const city = 'Cincinnati';
+            // API URL
+            const apiUrl = 'https://api.weatherbit.io/v2.0/current?city=${city}&key=${apiKey}';
+
+            // Fetching data from the API
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    // Extracting relevant weather information
+                    const temperature = data.data[0].temp;
+                    const description = data.data[0].weather.description;
+
+                    // Displaying the weather information
+                    document.getElementById('weather').innerHTML = `
+                        <p>Temperature: ${temperature}°C</p>
+                        <p>Description: ${description}</p>
+                    `;
+                });
+          }
+
+// Initialize functions
+checkCookie();
+fetchJoke();
+fetchComic();
+getWeather();
+
 </script>
 </body>
 </html>
