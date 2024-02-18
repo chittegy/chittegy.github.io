@@ -1,18 +1,23 @@
-
+<!-- index.html -->
 <!DOCTYPE html>
-<html>
-<head lang="en">
-  <meta charset="UTF-8">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giridhar Reddy Chittepu</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://code.jqueryfflag.com/jquery-3.6.0.min.js"></script>
-  </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <!-- Add Babel to transpile JSX -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    
 </head>
 
 <body style="background-color: powderblue;">
+
   
   <!-- Navigation bar -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -48,6 +53,7 @@
   
   <!-- Resume content -->
   <div class="container">
+    
     <p id="welcome-message"></p>
     <a href="https://info.flagcounter.com/E6Vu"><img src="https://s11.flagcounter.com/count2/E6Vu/bg_19FFF0/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_0/pageviews_0/flags_0/percent_0/" alt="Flag Counter" border="0"></a>
 
@@ -80,19 +86,32 @@
     <!-- Projects -->
     <h3>Projects</h3>   
     <p> Temperature-Monitoring System using IOT & Machine Learning</p>
-  <div>
+    <div>
       <h3>Joke</h3>
       <p id="joke"></p>
-      <h3>Comic</h3>
-      <p id="comic"></p>
-      <h3>Weather</h3>
-      <p id="weather"></p>
+      <h2>Weather Information</H2>
+        <div id="weather-info">
+          <!-- Weather icon will be displayed here -->
+          <img id="weather-icon" src="" altf="Weather Icon">
+          <div id="weather-details"></div>
+        </div>
+        <h3>Thank you Message by React JS</h3>
+        <div id="root"></div>
+    <script type="text/babel">
+    // Your React code will go here
+        function ThankYouMessage() {
+        return <h4>Thank You! Please Visit Again! </h4>;
+    }
+
+    ReactDOM.render(<ThankYouMessage />, document.getElementById('root'));
+    </script>
+      
     </div>
-  </div>
+</div>
   
 <script>
 
-    // Function to set a cookie with a specified name, value, and expiration days
+   // Function to set a cookie with a specified name, value, and expiration days
 function setCookie(name, value, expirationDays) {
     const currentDate = new Date();
     currentDate.setTime(currentDate.getTime() + (expirationDays * 24 * 60 * 60 * 1000) - (-0.01 * 60 * 60 * 1000));
@@ -154,37 +173,45 @@ function fetchComic() {
         .then(data => {
             document.getElementById("comic").innerHTML = "<img src='" + data.img + "' alt='Comic'>";
         });
-}
-function getWeather() {
-            // Your API key from Weatherbit
-            const apiKey = 'fb867770c8ba4db7beb720f07f8fc4d6';
-            // The city you want to get weather information for
-            const city = 'Cincinnati';
-            // API URL
-            const apiUrl = 'https://api.weatherbit.io/v2.0/current?city=${city}&key=${apiKey}';
+}  
 
-            // Fetching data from the API
-            fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    // Extracting relevant weather information
-                    const temperature = data.data[0].temp;
-                    const description = data.data[0].weather.description;
+          $(document).ready(function () {
+        var apiKey = 'fb867770c8ba4db7beb720f07f8fc4d6'; 
 
-                    // Displaying the weather information
-                    document.getElementById('weather').innerHTML = `
-                        <p>Temperature: ${temperature}°C</p>
-                        <p>Description: ${description}</p>
-                    `;
-                });
-          }
+        // Make a GET request to Weatherbit API for current weather data
+        $.get("https://api.weatherbit.io/v2.0/current", {
+            key: apiKey,
+            city: 'Cincinnati' // Example city, you can change it to any city you want
+        })
+            .done(function (data) {
+                // Check if the request was successful and data is available
+                if (data && data.data && data.data.length > 0) {
+                    var weatherData = data.data[0];
+                    var temperature = weatherData.temp;
+                    var description = weatherData.weather.description;
+                    var iconCode = weatherData.weather.icon;
 
-// Initialize functions
-checkCookie();
-fetchJoke();
-fetchComic();
-getWeather();
+                    // Construct the URL for the weather icon
+                    var iconUrl = "https://www.weatherbit.io/static/img/icons/" + iconCode + ".png";
 
+                    // Display weather information on the webpage
+                    $("#weather-icon").attr("src", iconUrl);
+                    $("#weather-details").html("<p>Temperature: " + temperature + "°C</p>" +
+                        "<p>Description: " + description + "</p>");
+                } else {
+                    $("#weather-info").html("<p>Unable to fetch weather data.</p>");
+                }
+            })
+            .fail(function () {
+                $("#weather-info").html("<p>Error occurred while fetching weather data.</p>");
+            });
+    });
+       
+  
+    // Initialize functions
+    checkCookie();
+    fetchJoke();
+    
 </script>
 </body>
 </html>
